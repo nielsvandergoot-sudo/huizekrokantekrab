@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Huisweekend</title>
     
-    <!-- PWA & iOS instellingen -->
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,10 +15,43 @@
 </head>
 <body>
     <header>
-        <h1>Programma Huisweekend</h1>
+        <h1 id="app-title">Huisweekend</h1>
     </header>
-    <main id="schema-container">
-        <!-- Schema wordt hier door JavaScript ingeladen -->
+    
+    <main>
+        <!-- HET HOMESCHERM -->
+        <section id="view-home" class="view active">
+            <h2>Welkom!</h2>
+            <p>Kies een optie in het menu.</p>
+            
+            <div class="menu-grid">
+                <!-- Navigatie knop naar Programma -->
+                <button class="menu-btn" onclick="openScherm('programma')">
+                    <span class="icon">📅</span> 
+                    Programma
+                </button>
+                
+                <!-- Alvast wat placeholders voor latere features -->
+                <button class="menu-btn disabled">
+                    <span class="icon">🍺</span> 
+                    Turflijst (Snel)
+                </button>
+                <button class="menu-btn disabled">
+                    <span class="icon">🎲</span> 
+                    Spellen (Snel)
+                </button>
+            </div>
+        </section>
+
+        <!-- HET PROGRAMMA SCHERM -->
+        <section id="view-programma" class="view">
+            <!-- Terugknop naar Home -->
+            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug naar menu</button>
+            
+            <div id="schema-container">
+                <!-- Schema wordt hier door JavaScript ingeladen -->
+            </div>
+        </section>
     </main>
 
     <script src="app.js"></script>
