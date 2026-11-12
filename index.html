@@ -8,7 +8,6 @@
     <link rel="manifest" href="manifest.json">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="Huize Krokante Krab">
     <link rel="apple-touch-icon" href="icon.png">
     
     <link rel="stylesheet" href="style.css">
@@ -21,39 +20,46 @@
     <main>
         <!-- HET HOMESCHERM -->
         <section id="view-home" class="view active">
-            <h2>Welkom!</h2>
-            <p>Kies een optie in het menu.</p>
-            
             <div class="menu-grid">
-                <!-- Navigatie knop naar Programma -->
-                <button class="menu-btn" onclick="openScherm('programma')">
-                    <span class="icon">📅</span> 
-                    Programma
+                <!-- Anytimers -->
+                <button class="menu-btn" onclick="openScherm('anytimers')">
+                    <span class="icon">⏱️</span> 
+                    Anytimers
                 </button>
-                
-                <!-- Alvast wat placeholders voor latere features -->
-                <button class="menu-btn disabled">
-                    <span class="icon">🍺</span> 
-                    Anylijst
-                </button>
-                <button class="menu-btn disabled">
-                    <span class="icon">🎲</span> 
-                    Spellen
+
+                <!-- Huisweekend (wordt gelocked via JS) -->
+                <button id="btn-weekend" class="menu-btn" onclick="openScherm('programma')">
+                    <span class="icon">🏕️</span> 
+                    Huisweekend
+                    <span id="weekend-status" class="status-badge">Checkt datum...</span>
                 </button>
             </div>
         </section>
 
         <!-- HET PROGRAMMA SCHERM -->
         <section id="view-programma" class="view">
-            <!-- Terugknop naar Home -->
-            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug naar menu</button>
+            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug</button>
+            <div id="schema-container"></div>
+        </section>
+
+        <!-- HET ANYTIMER SCHERM -->
+        <section id="view-anytimers" class="view">
+            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug</button>
             
-            <div id="schema-container">
-                <!-- Schema wordt hier door JavaScript ingeladen -->
+            <div class="actie-balk">
+                <button class="actie-btn" onclick="nieuwVerzoek()">+ Nieuwe Anytimer</button>
+            </div>
+
+            <div id="anytimer-container">
+                <!-- Wordt gevuld door JavaScript -->
             </div>
         </section>
     </main>
 
+    <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+    <!-- Firebase Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>
+
 </body>
 </html>
