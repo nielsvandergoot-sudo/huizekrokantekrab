@@ -1,6 +1,6 @@
 // --- CONFIGURATIE ---
 const WEEKEND_DATUM = new Date('2027-02-26T18:00:00'); // Vul hier de startdatum in
-
+const huisgenoten = ['Niels', 'Fay', 'Aimee', 'Minou', 'Aniek', 'Suus', 'Jesper', 'Mees', 'Felix', 'Caro', 'Timo', 'Teun', 'Nikki', 'Sean'];
 
 // --- NAVIGATIE ---
 function openScherm(schermNaam) {
@@ -130,43 +130,78 @@ function verwijderItem(id) {
 function verzoekVerwijderen(id) {
     updateStatus(id, 'pending_remove');
 }
-
+// --- MODAL LOGICA VOOR NIEUW VERZOEK ---
 function nieuwVerzoek() {
-    // Om te testen pakken we twee willekeurige namen uit de groep. 
-    // In een latere iteratie kun je hier een HTML formulier voor maken.
-    const huisgenoten = ['Niels', 'Fay', 'Aimee', 'Minou', 'Aniek', 'Suus'];
-    const van = huisgenoten[Math.floor(Math.random() * huisgenoten.length)];
-    let voor = huisgenoten[Math.floor(Math.random() * huisgenoten.length)];
-    while(voor === van) voor = huisgenoten[Math.floor(Math.random() * huisgenoten.length)]; // Voorkom zelf-anytimers
+    const selectVan = document.getElementById('select-van');
+    const selectVoor = document.getElementById('select-voor');
+    
+    // Maak de dropdowns leeg
+    selectVan.innerHTML = '';
+    selectVoor.innerHTML = '';
+    
+    // Vul de dropdowns met jouw huisgenoten
+    huisgenoten.forEach(naam => {
+        selectVan.innerHTML += `<option value="${naam}">${naam}</option>`;
+        selectVoor.innerHTML += `<option value="${naam}">${naam}</option>`;
+    });
 
+    // Toon de pop-up
+    document.getElementById('anytimer-modal').classList.add('actief');
+}
+
+function sluitModal() {
+    document.getElementById('anytimer-modal').classList.remove('actief');
+}
+
+function opslaanNieuwVerzoek() {
+    const van = document.getElementById('select-van').value;
+    const voor = document.getElementById('select-voor').value;
+
+    if (van === voor) {
+        alert("Je kunt geen anytimer aan jezelf geven!");
+        return;
+    }
+
+    // Sla op in Firebase
     db.collection("anytimers").add({
         van: van,
         voor: voor,
         status: 'pending_add',
-        timestamp: firebase.firestore.FieldValue.serverTimestamp() // Sorteert alles chronologisch
+        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+    }).then(() => {
+        sluitModal(); // Sluit popup bij succes
     }).catch(error => console.error("Fout bij toevoegen:", error));
-}
-// Tijdelijke mock-functies om de UI te testen
-function updateStatus(id, nieuweStatus) {
-    const at = anytimers.find(a => a.id === id);
-    if(at) at.status = nieuweStatus;
-    renderAnytimers();
-}
-function verwijderItem(id) {
-    anytimers = anytimers.filter(a => a.id !== id);
-    renderAnytimers();
-}
-function verzoekVerwijderen(id) {
-    updateStatus(id, 'pending_remove');
-}
-function nieuwVerzoek() {
-    // Later bouw je hier een dropdown menu om huisgenoten te selecteren
-    anytimers.push({ id: Date.now(), van: 'Jij', voor: 'Huisgenoot', status: 'pending_add' });
-    renderAnytimers();
 }
 
 // Initialisatie bij opstarten
 document.addEventListener('DOMContentLoaded', () => {
     updateWeekendKnop();
-    // Programma JSON laden code staat hier (idem als vorige versie)
+    
+    // Programma JSON laden
+    const container = document.getElementById('schema-container');
+    fetch('schema.json')
+        .then(response => response.json())
+        .then(data => {
+            let huidigeDag = '';
+            data.forEach(item => {
+                if (item.dag !== huidigeDag) {
+                    const dagKop = document.createElement('h2');
+                    dagKop.className = 'dag-header';
+                    dagKop.textContent = item.dag;
+                    container.appendChild(dagKop);
+                    huidigeDag = item.dag;
+                }
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-top">
+                        <span class="activiteit">${item.activiteit}</span>
+                        <span class="tijd">${item.tijd}</span>
+                    </div>
+                    <div class="details">${item.details}</div>
+                `;
+                container.appendChild(card);
+            });
+        })
+        .catch(error => console.error('Fout bij het laden van het schema:', error));
 });

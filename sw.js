@@ -1,4 +1,4 @@
-const CACHE_NAME = 'huizekrokantekrab-v2'; // Verhoog dit naar v2, v3 etc. als je de HTML of CSS aanpast
+const CACHE_NAME = 'huizekrokantekrab-v3'; // Verhoog dit naar v2, v3 etc. als je de HTML of CSS aanpast
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

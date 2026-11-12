@@ -54,6 +54,24 @@
                 <!-- Wordt gevuld door JavaScript -->
             </div>
         </section>
+        <!-- ANYTIMER POP-UP (MODAL) -->
+        <div id="anytimer-modal" class="modal">
+            <div class="modal-content">
+                <h3>Nieuwe Anytimer</h3>
+                
+                <label>Van (Wie geeft hem?):</label>
+                <select id="select-van"></select>
+                
+                <label>Voor (Wie moet hem trekken?):</label>
+                <select id="select-voor"></select>
+                
+                <div class="modal-acties">
+                    <button onclick="sluitModal()" class="btn-sm btn-outline">Annuleer</button>
+                    <button onclick="opslaanNieuwVerzoek()" class="btn-sm btn-groen">Verstuur Verzoek</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>

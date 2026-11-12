@@ -1,4 +1,99 @@
-/* Weekend status badge */
+/* --- ALGEMENE STYLING --- */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+}
+
+body {
+    background-color: #f4f4f9;
+    color: #333;
+    padding-bottom: 40px;
+}
+
+header {
+    background-color: #1a1a2e;
+    color: white;
+    padding: 20px;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+main {
+    padding: 15px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+/* --- NAVIGATIE LOGICA (SPA) --- */
+.view {
+    display: none; /* Verberg alle schermen standaard */
+}
+
+.view.active {
+    display: block; /* Toon alleen het actieve scherm */
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* --- HOME MENU STYLING --- */
+#view-home h2 {
+    margin-bottom: 5px;
+}
+
+#view-home p {
+    color: #666;
+    margin-bottom: 25px;
+}
+
+.menu-grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 15px;
+}
+
+.menu-btn {
+    background-color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    color: #1a1a2e;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.1s;
+}
+
+.menu-btn:active {
+    transform: scale(0.98);
+}
+
+.menu-btn .icon {
+    font-size: 24px;
+    margin-right: 15px;
+}
+
+.menu-btn.disabled {
+    background-color: #e5e5e5;
+    color: #999;
+    cursor: not-allowed;
+}
+
+.menu-btn.locked {
+    opacity: 0.7;
+    background-color: #f0f0f0;
+}
+
 .status-badge {
     font-size: 12px;
     color: white;
@@ -7,12 +102,52 @@
     margin-left: auto;
 }
 
-.menu-btn.locked {
-    opacity: 0.7;
-    background-color: #f0f0f0;
+.terug-btn {
+    background: none;
+    border: none;
+    color: #e94560;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 0 20px 0;
+    cursor: pointer;
 }
 
-/* Anytimer Cards */
+/* --- PROGRAMMA STYLING --- */
+.dag-header {
+    margin: 15px 0 10px 0;
+    color: #1a1a2e;
+    border-bottom: 2px solid #e94560;
+    padding-bottom: 5px;
+}
+
+.card {
+    background: white;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column;
+}
+
+.card-top {
+    display: flex;
+    justify-content: space-between;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.tijd {
+    color: #e94560;
+}
+
+.details {
+    color: #666;
+    font-size: 0.9em;
+    line-height: 1.4;
+}
+
+/* --- ANYTIMER STYLING --- */
 .actie-balk {
     margin-bottom: 15px;
     text-align: right;
@@ -51,15 +186,3 @@
     display: flex;
     gap: 8px;
 }
-
-.btn-sm {
-    padding: 6px 12px;
-    border-radius: 4px;
-    border: none;
-    font-weight: bold;
-    cursor: pointer;
-}
-
-.btn-groen { background-color: #4caf50; color: white; }
-.btn-rood { background-color: #e94560; color: white; }
-.btn-outline { background-color: transparent; border: 1px solid #666; color: #333; }
