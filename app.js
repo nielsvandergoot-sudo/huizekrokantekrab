@@ -1,5 +1,4 @@
-// --- CONFIGURATIE ---
-const WEEKEND_DATUM = new Date('2027-02-26T18:00:00'); // Vul hier de startdatum in
+const WEEKEND_DATUM = new Date('2027-02-26T18:00:00');
 const huisgenoten = ['Niels', 'Fay', 'Aimee', 'Minou', 'Aniek', 'Suus', 'Jesper', 'Mees', 'Felix', 'Caro', 'Timo', 'Teun', 'Nikki', 'Sean'];
 
 // --- NAVIGATIE ---
@@ -56,55 +55,46 @@ const firebaseConfig = {
     appId: "1:175111862980:web:4b4b3e0a81c3a35ba1a791"
 };
 
-// Initialiseer Firebase
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
-
 let anytimers = [];
 
-// --- REALTIME DATABASE LISTENER ---
-// Dit blokje vuurt automatisch af zodra de app opent én elke keer als er data verandert in de cloud.
 db.collection("anytimers").orderBy("timestamp", "desc").onSnapshot((snapshot) => {
     anytimers = [];
     snapshot.forEach((doc) => {
         anytimers.push({ id: doc.id, ...doc.data() });
     });
     
-    // Alleen renderen als we daadwerkelijk op het anytimer-scherm zitten
     if (document.getElementById('view-anytimers').classList.contains('active')) {
         renderAnytimers();
     }
 });
 
-// --- ANYTIMER LOGICA ---
+// --- ANYTIMER LEDGER LOGICA ---
 function renderAnytimers() {
     const container = document.getElementById('anytimer-container');
     container.innerHTML = '';
 
     anytimers.forEach(at => {
+        // Verberg als de balans 0 is en er is geen inzet gaande
+        if ((at.aantal || 0) <= 0 && !at.inzet_actief) return;
+
         const card = document.createElement('div');
-        card.className = `at-card ${at.status}`;
+        card.className = `at-card ${at.inzet_actief ? 'inzet' : 'normaal'}`;
         
         let actieKnoppen = '';
         let tekst = '';
 
-        if (at.status === 'actief') {
-            tekst = `<strong>${at.van}</strong> heeft er één op <strong>${at.voor}</strong>`;
-            actieKnoppen = `<button onclick="verzoekVerwijderen('${at.id}')" class="btn-sm btn-outline">Trek in</button>`;
-        } 
-        else if (at.status === 'pending_add') {
-            tekst = `Nieuw verzoek: <strong>${at.van}</strong> op <strong>${at.voor}</strong>`;
+        if (at.inzet_actief) {
+            tekst = `<div class="inzet-waarschuwing">🚨 ${at.van} zet er één in op ${at.voor}!</div>`;
             actieKnoppen = `
-                <button onclick="updateStatus('${at.id}', 'actief')" class="btn-sm btn-groen">Accepteer</button>
-                <button onclick="verwijderItem('${at.id}')" class="btn-sm btn-rood">Weiger</button>
+                <button onclick="resolveInzet('${at.id}', true)" class="btn-sm btn-groen">Getrokken (-1)</button>
+                <button onclick="resolveInzet('${at.id}', false)" class="btn-sm btn-rood">Geweigerd (+1)</button>
+                <button onclick="cancelInzet('${at.id}')" class="btn-sm btn-outline">Annuleer</button>
             `;
-        }
-        else if (at.status === 'pending_remove') {
-            tekst = `Verwijder verzoek: <strong>${at.van}</strong> op <strong>${at.voor}</strong>`;
-            actieKnoppen = `
-                <button onclick="verwijderItem('${at.id}')" class="btn-sm btn-groen">Accepteer (is getrokken)</button>
-                <button onclick="updateStatus('${at.id}', 'actief')" class="btn-sm btn-rood">Weiger</button>
-            `;
+        } else {
+            tekst = `<strong>${at.van}</strong> heeft er <strong>${at.aantal}</strong> op <strong>${at.voor}</strong>`;
+            actieKnoppen = `<button onclick="startInzet('${at.id}')" class="btn-sm btn-rood">Zet in!</button>`;
         }
 
         card.innerHTML = `
@@ -115,37 +105,37 @@ function renderAnytimers() {
     });
 }
 
-// Database Mutaties
-function updateStatus(id, nieuweStatus) {
+function startInzet(id) {
+    db.collection("anytimers").doc(id).update({ inzet_actief: true });
+}
+
+function cancelInzet(id) {
+    db.collection("anytimers").doc(id).update({ inzet_actief: false });
+}
+
+function resolveInzet(id, getrokken) {
+    // Getrokken = -1, Geweigerd = +1 (straf)
+    const verandering = getrokken ? -1 : 1;
     db.collection("anytimers").doc(id).update({ 
-        status: nieuweStatus 
-    }).catch(error => console.error("Fout bij updaten:", error));
+        aantal: firebase.firestore.FieldValue.increment(verandering),
+        inzet_actief: false
+    });
 }
 
-function verwijderItem(id) {
-    db.collection("anytimers").doc(id).delete()
-        .catch(error => console.error("Fout bij verwijderen:", error));
-}
-
-function verzoekVerwijderen(id) {
-    updateStatus(id, 'pending_remove');
-}
-// --- MODAL LOGICA VOOR NIEUW VERZOEK ---
+// --- MODAL LOGICA ---
 function nieuwVerzoek() {
     const selectVan = document.getElementById('select-van');
     const selectVoor = document.getElementById('select-voor');
     
-    // Maak de dropdowns leeg
     selectVan.innerHTML = '';
     selectVoor.innerHTML = '';
+    document.getElementById('input-aantal').value = 1;
     
-    // Vul de dropdowns met jouw huisgenoten
     huisgenoten.forEach(naam => {
         selectVan.innerHTML += `<option value="${naam}">${naam}</option>`;
         selectVoor.innerHTML += `<option value="${naam}">${naam}</option>`;
     });
 
-    // Toon de pop-up
     document.getElementById('anytimer-modal').classList.add('actief');
 }
 
@@ -156,28 +146,35 @@ function sluitModal() {
 function opslaanNieuwVerzoek() {
     const van = document.getElementById('select-van').value;
     const voor = document.getElementById('select-voor').value;
+    const aantal = parseInt(document.getElementById('input-aantal').value, 10);
 
     if (van === voor) {
-        alert("Je kunt geen anytimer aan jezelf geven!");
+        alert("Je kunt geen anytimers op jezelf verdienen!");
+        return;
+    }
+    if (isNaN(aantal) || aantal <= 0) {
+        alert("Vul een geldig aantal in.");
         return;
     }
 
-    // Sla op in Firebase
-    db.collection("anytimers").add({
+    // We gebruiken de combinatie van namen als ID, zodat ze altijd bij elkaar worden opgeteld
+    const docId = `${van}_${voor}`;
+
+    db.collection("anytimers").doc(docId).set({
         van: van,
         voor: voor,
-        status: 'pending_add',
+        aantal: firebase.firestore.FieldValue.increment(aantal),
+        inzet_actief: false,
         timestamp: firebase.firestore.FieldValue.serverTimestamp()
-    }).then(() => {
-        sluitModal(); // Sluit popup bij succes
+    }, { merge: true }).then(() => {
+        sluitModal();
     }).catch(error => console.error("Fout bij toevoegen:", error));
 }
 
-// Initialisatie bij opstarten
+// --- INITIALISATIE ---
 document.addEventListener('DOMContentLoaded', () => {
     updateWeekendKnop();
     
-    // Programma JSON laden
     const container = document.getElementById('schema-container');
     fetch('schema.json')
         .then(response => response.json())
@@ -203,5 +200,5 @@ document.addEventListener('DOMContentLoaded', () => {
                 container.appendChild(card);
             });
         })
-        .catch(error => console.error('Fout bij het laden van het schema:', error));
+        .catch(error => console.error('Fout bij laden schema:', error));
 });

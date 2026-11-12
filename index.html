@@ -18,16 +18,13 @@
     </header>
     
     <main>
-        <!-- HET HOMESCHERM -->
         <section id="view-home" class="view active">
             <div class="menu-grid">
-                <!-- Anytimers -->
                 <button class="menu-btn" onclick="openScherm('anytimers')">
                     <span class="icon">⏱️</span> 
                     Anytimers
                 </button>
 
-                <!-- Huisweekend (wordt gelocked via JS) -->
                 <button id="btn-weekend" class="menu-btn" onclick="openScherm('programma')">
                     <span class="icon">🏕️</span> 
                     Huisweekend
@@ -36,48 +33,47 @@
             </div>
         </section>
 
-        <!-- HET PROGRAMMA SCHERM -->
         <section id="view-programma" class="view">
             <button class="terug-btn" onclick="openScherm('home')">⬅ Terug</button>
             <div id="schema-container"></div>
         </section>
 
-        <!-- HET ANYTIMER SCHERM -->
         <section id="view-anytimers" class="view">
             <button class="terug-btn" onclick="openScherm('home')">⬅ Terug</button>
             
             <div class="actie-balk">
-                <button class="actie-btn" onclick="nieuwVerzoek()">+ Nieuwe Anytimer</button>
+                <button class="actie-btn" onclick="nieuwVerzoek()">+ Verdien Anytimers</button>
             </div>
 
             <div id="anytimer-container">
                 <!-- Wordt gevuld door JavaScript -->
             </div>
         </section>
+
         <!-- ANYTIMER POP-UP (MODAL) -->
         <div id="anytimer-modal" class="modal">
             <div class="modal-content">
-                <h3>Nieuwe Anytimer</h3>
+                <h3>Verdien Anytimers</h3>
                 
-                <label>Van (Wie geeft hem?):</label>
+                <label>Van (Wie heeft ze verdiend?):</label>
                 <select id="select-van"></select>
                 
-                <label>Voor (Wie moet hem trekken?):</label>
+                <label>Voor (Op wie?):</label>
                 <select id="select-voor"></select>
+
+                <label>Aantal:</label>
+                <input type="number" id="input-aantal" value="1" min="1" max="100">
                 
                 <div class="modal-acties">
                     <button onclick="sluitModal()" class="btn-sm btn-outline">Annuleer</button>
-                    <button onclick="opslaanNieuwVerzoek()" class="btn-sm btn-groen">Verstuur Verzoek</button>
+                    <button onclick="opslaanNieuwVerzoek()" class="btn-sm btn-groen">Voeg Toe</button>
                 </div>
             </div>
         </div>
-
     </main>
 
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
-    <!-- Firebase Firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
     <script src="app.js"></script>
-
 </body>
 </html>
