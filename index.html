@@ -14,30 +14,47 @@
 </head>
 <body>
     <header>
-        <h1 id="app-title">Huize Krokante Krab</h1>
+        <h1 id="app-title">Laden...</h1>
     </header>
     
     <main>
-        <section id="view-home" class="view active">
+        <!-- HET INLOGSCHERM -->
+        <section id="view-login" class="view active">
+            <div class="login-box">
+                <h2>Welkom Huisgenoot</h2>
+                <p>Log in om verder te gaan</p>
+                <input type="email" id="login-email" placeholder="naam@krokantekrab.nl">
+                <input type="password" id="login-password" placeholder="Wachtwoord">
+                <button onclick="login()" class="actie-btn log-btn">Log In</button>
+                <p id="login-error" class="error-msg"></p>
+            </div>
+        </section>
+
+        <!-- HET HOMESCHERM -->
+        <section id="view-home" class="view">
             <div class="menu-grid">
                 <button class="menu-btn" onclick="openScherm('anytimers')">
-                    <span class="icon">⏱️</span> 
-                    Anytimers
+                    <span class="icon">⏱️</span> Anytimers
                 </button>
 
                 <button id="btn-weekend" class="menu-btn" onclick="openScherm('programma')">
-                    <span class="icon">🏕️</span> 
-                    Huisweekend
+                    <span class="icon">🏕️</span> Huisweekend
                     <span id="weekend-status" class="status-badge">Checkt datum...</span>
+                </button>
+                
+                <button class="menu-btn logout" onclick="uitloggen()">
+                    <span class="icon">🚪</span> Uitloggen
                 </button>
             </div>
         </section>
 
+        <!-- HET PROGRAMMA SCHERM -->
         <section id="view-programma" class="view">
             <button class="terug-btn" onclick="openScherm('home')">⬅ Terug</button>
             <div id="schema-container"></div>
         </section>
 
+        <!-- HET ANYTIMER SCHERM -->
         <section id="view-anytimers" class="view">
             <button class="terug-btn" onclick="openScherm('home')">⬅ Terug</button>
             
@@ -72,8 +89,12 @@
         </div>
     </main>
 
+    <!-- Firebase App (Core) -->
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
+    <!-- Firebase Auth & Firestore -->
+    <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
+    
     <script src="app.js"></script>
 </body>
 </html>

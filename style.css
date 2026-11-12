@@ -43,16 +43,49 @@ main {
     to { opacity: 1; transform: translateY(0); }
 }
 
-/* --- HOME MENU STYLING --- */
-#view-home h2 {
-    margin-bottom: 5px;
+/* --- LOGIN SCHERM --- */
+.login-box {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+    text-align: center;
+    margin-top: 40px;
 }
 
-#view-home p {
+.login-box h2 {
+    color: #1a1a2e;
+    margin-bottom: 10px;
+}
+
+.login-box p {
     color: #666;
-    margin-bottom: 25px;
+    margin-bottom: 20px;
 }
 
+.login-box input {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 15px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.log-btn {
+    width: 100%;
+    padding: 15px;
+    font-size: 16px;
+}
+
+.error-msg {
+    color: #e94560 !important;
+    margin-top: 15px;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* --- HOME MENU STYLING --- */
 .menu-grid {
     display: grid;
     grid-template-columns: 1fr;
@@ -86,6 +119,12 @@ main {
 .menu-btn.locked {
     opacity: 0.7;
     background-color: #f0f0f0;
+}
+
+.menu-btn.logout {
+    background-color: #ffe6e6;
+    color: #e94560;
+    margin-top: 20px;
 }
 
 .status-badge {
@@ -167,7 +206,6 @@ main {
     transition: all 0.3s ease;
 }
 
-/* Actieve Inzet Animatie */
 .at-card.inzet {
     border-left-color: #e94560;
     background-color: #fff0f0;

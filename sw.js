@@ -1,4 +1,4 @@
-const CACHE_NAME = 'huisweekend-v6'; // Vernieuwd voor de Ledger Update
+const CACHE_NAME = 'huisweekend-v7'; // Verhoogd voor Accounts Update
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
