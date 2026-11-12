@@ -1,0 +1,56 @@
+[
+  {
+    "dag": "Vrijdag",
+    "tijd": "17:00",
+    "activiteit": "Meldplicht fusie",
+    "details": "Iedere 5 minuten te laat is een bak"
+  },
+  {
+    "dag": "Vrijdag",
+    "tijd": "17:30",
+    "activiteit": "Vreten",
+    "details": ""
+  },
+  {
+    "dag": "Zaterdag",
+    "tijd": "11:00",
+    "activiteit": "Katerontbijt",
+    "details": "Sjaarzen mogen ons goed zetten"
+  },
+  {
+    "dag": "Zaterdag",
+    "tijd": "12:00",
+    "activiteit": "Katerborrel",
+    "details": ""
+  },
+  {
+    "dag": "Zaterdag",
+    "tijd": "13:00",
+    "activiteit": "Katerlunch",
+    "details": ""
+  },
+  {
+    "dag": "Zaterdag",
+    "tijd": "14:00",
+    "activiteit": "Katerborrel",
+    "details": ""
+  },
+  {
+    "dag": "Zaterdag",
+    "tijd": "15:00",
+    "activiteit": "Katerborrel",
+    "details": ""
+  },
+  {
+    "dag": "Zaterdag",
+    "tijd": "16:00",
+    "activiteit": "Katerborrel",
+    "details": ""
+  },
+  {
+    "dag": "Zaterdag",
+    "tijd": "17:00",
+    "activiteit": "",
+    "details": ""
+  }
+]
