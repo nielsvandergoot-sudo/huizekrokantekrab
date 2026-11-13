@@ -1,4 +1,4 @@
-const CACHE_NAME = 'huisweekend-v8'; // Inclusief de Krabbia's visuele assets
+const CACHE_NAME = 'huisweekend-v9'; // Inclusief de Krabbia's visuele assets
 const ASSETS_TO_CACHE = [
     './',
     './index.html',

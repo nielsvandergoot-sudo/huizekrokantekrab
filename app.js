@@ -38,7 +38,7 @@ function login() {
     
     firebase.auth().signInWithEmailAndPassword(email, ww)
         .then(() => errorMsg.textContent = '')
-        .catch(() => errorMsg.textContent = 'Bij Davy Jones, die inloggegevens kloppen niet! ⚓');
+        .catch(() => errorMsg.textContent = 'Je hebt een typfout gemaakt randdebiel');
 }
 
 function uitloggen() {
@@ -48,7 +48,7 @@ function uitloggen() {
 // --- NAVIGATIE ---
 function openScherm(schermNaam) {
     if (schermNaam === 'programma' && !isWeekendOntgrendeld()) {
-        alert('Geduld, krab! Het schema zit nog in een afgesloten schatkist.');
+        alert('Nog ff wachten ongeduldig stuk vreten');
         return;
     }
 
@@ -56,11 +56,11 @@ function openScherm(schermNaam) {
     document.getElementById('view-' + schermNaam).classList.add('active');
 
     const titel = document.getElementById('app-title');
-    if (schermNaam === 'login') titel.textContent = 'Kombuis Deur ⚓';
-    else if (schermNaam === 'home') titel.textContent = `Ahoi, ${currentUser}! 🦀`;
+    if (schermNaam === 'login') titel.textContent = 'Inloggen bij de Krokante Krab';
+    else if (schermNaam === 'home') titel.textContent = `Fakka, ${currentUser}! 🦀`;
     else if (schermNaam === 'programma') titel.textContent = 'Logboek';
     else if (schermNaam === 'anytimers') {
-        titel.textContent = 'Anytimers Ledger';
+        titel.textContent = 'Anytimers';
         renderAnytimers();
     }
 }
@@ -169,7 +169,7 @@ function opslaanNieuwVerzoek() {
     const voor = document.getElementById('select-voor').value;
     const aantal = parseInt(document.getElementById('input-aantal').value, 10);
 
-    if (van === voor) return alert("Bij Davy Jones! Je kan toch geen schulden bij jezelf hebben?");
+    if (van === voor) return alert("Waarom de fuck zou je jezelf een anytimer geven?");
     if (isNaN(aantal) || aantal <= 0) return alert("Krab, voer eens een fatsoenlijk aantal in!");
 
     const docId = `${van}_${voor}`;
