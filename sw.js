@@ -1,4 +1,4 @@
-const CACHE_NAME = 'huisweekend-v7'; // Verhoogd voor Accounts Update
+const CACHE_NAME = 'huisweekend-v8'; // Inclusief de Krabbia's visuele assets
 const ASSETS_TO_CACHE = [
     './',
     './index.html',
@@ -6,7 +6,8 @@ const ASSETS_TO_CACHE = [
     './app.js',
     './schema.json',
     './manifest.json',
-    './icon.png'
+    './icon.png',
+    './krabbias.png'
 ];
 
 self.addEventListener('install', event => {

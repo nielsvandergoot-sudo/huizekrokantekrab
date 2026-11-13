@@ -20,7 +20,6 @@ const db = firebase.firestore();
 // --- AUTHENTICATIE LOGICA ---
 firebase.auth().onAuthStateChanged((user) => {
     if (user) {
-        // Haal de naam uit het e-mailadres (niels@krokantekrab.nl -> Niels)
         let emailNaam = user.email.split('@')[0];
         currentUser = emailNaam.charAt(0).toUpperCase() + emailNaam.slice(1).toLowerCase();
         
@@ -39,7 +38,7 @@ function login() {
     
     firebase.auth().signInWithEmailAndPassword(email, ww)
         .then(() => errorMsg.textContent = '')
-        .catch(() => errorMsg.textContent = 'Verkeerd e-mailadres of wachtwoord.');
+        .catch(() => errorMsg.textContent = 'Bij Davy Jones, die inloggegevens kloppen niet! ⚓');
 }
 
 function uitloggen() {
@@ -49,7 +48,7 @@ function uitloggen() {
 // --- NAVIGATIE ---
 function openScherm(schermNaam) {
     if (schermNaam === 'programma' && !isWeekendOntgrendeld()) {
-        alert('Het programma is pas 7 dagen van tevoren zichtbaar!');
+        alert('Geduld, krab! Het schema zit nog in een afgesloten schatkist.');
         return;
     }
 
@@ -57,11 +56,11 @@ function openScherm(schermNaam) {
     document.getElementById('view-' + schermNaam).classList.add('active');
 
     const titel = document.getElementById('app-title');
-    if (schermNaam === 'login') titel.textContent = 'Inloggen';
-    else if (schermNaam === 'home') titel.textContent = `Welkom, ${currentUser}`;
-    else if (schermNaam === 'programma') titel.textContent = 'Programma';
+    if (schermNaam === 'login') titel.textContent = 'Kombuis Deur ⚓';
+    else if (schermNaam === 'home') titel.textContent = `Ahoi, ${currentUser}! 🦀`;
+    else if (schermNaam === 'programma') titel.textContent = 'Logboek';
     else if (schermNaam === 'anytimers') {
-        titel.textContent = 'Mijn Anytimers';
+        titel.textContent = 'Anytimers Ledger';
         renderAnytimers();
     }
 }
@@ -78,12 +77,12 @@ function updateWeekendKnop() {
     
     if (isWeekendOntgrendeld()) {
         btn.classList.remove('locked');
-        status.textContent = 'Geopend!';
-        status.style.backgroundColor = '#4caf50';
+        status.textContent = 'Open! 🏕️';
+        status.style.backgroundColor = '#2a9d8f';
     } else {
         btn.classList.add('locked');
-        status.textContent = 'Nog geheim';
-        status.style.backgroundColor = '#999';
+        status.textContent = 'Geheim 🔒';
+        status.style.backgroundColor = '#d94141';
     }
 }
 
@@ -102,11 +101,10 @@ function renderAnytimers() {
     const container = document.getElementById('anytimer-container');
     container.innerHTML = '';
 
-    // FILTER: Laat alleen de anytimers zien waar de ingelogde gebruiker bij betrokken is!
     const mijnAnytimers = anytimers.filter(at => at.van === currentUser || at.voor === currentUser);
 
     if (mijnAnytimers.length === 0) {
-        container.innerHTML = '<p style="text-align:center; color:#666; margin-top:20px;">Je hebt momenteel geen anytimers open staan.</p>';
+        container.innerHTML = '<p style="text-align:center; color:#5c4e3c; margin-top:20px; font-style: italic;">Je ligt momenteel met niemand in de clinch...</p>';
         return;
     }
 
@@ -120,15 +118,15 @@ function renderAnytimers() {
         let tekst = '';
 
         if (at.inzet_actief) {
-            tekst = `<div class="inzet-waarschuwing">🚨 ${at.van} zet er één in op ${at.voor}!</div>`;
+            tekst = `<div class="inzet-waarschuwing">🚨 ADRENALINE! ${at.van} zet er een in op ${at.voor}!</div>`;
             actieKnoppen = `
-                <button onclick="resolveInzet('${at.id}', true)" class="btn-sm btn-groen">Getrokken</button>
-                <button onclick="resolveInzet('${at.id}', false)" class="btn-sm btn-rood">Weiger (+1)</button>
-                <button onclick="cancelInzet('${at.id}')" class="btn-sm btn-outline">Annuleer</button>
+                <button onclick="resolveInzet('${at.id}', true)" class="btn-sm btn-groen">Getrokken! (Adt 'm) 🍺</button>
+                <button onclick="resolveInzet('${at.id}', false)" class="btn-sm btn-rood">Weigering (+1 extra) ❌</button>
+                <button onclick="cancelInzet('${at.id}')" class="btn-sm btn-outline">Laat maar</button>
             `;
         } else {
-            tekst = `<strong>${at.van}</strong> heeft er <strong>${at.aantal}</strong> op <strong>${at.voor}</strong>`;
-            actieKnoppen = `<button onclick="startInzet('${at.id}')" class="btn-sm btn-rood">Zet in!</button>`;
+            tekst = `<strong>${at.van}</strong> heeft <strong>${at.aantal}</strong> openstaan bij <strong>${at.voor}</strong>`;
+            actieKnoppen = `<button onclick="startInzet('${at.id}')" class="btn-sm btn-rood">Zet er een in! ⏱️</button>`;
         }
 
         card.innerHTML = `<div class="at-info">${tekst}</div><div class="at-acties">${actieKnoppen}</div>`;
@@ -159,7 +157,6 @@ function nieuwVerzoek() {
         selectVoor.innerHTML += `<option value="${naam}">${naam}</option>`;
     });
 
-    // Zet de gever standaard op degene die is ingelogd
     selectVan.value = currentUser;
 
     document.getElementById('anytimer-modal').classList.add('actief');
@@ -172,8 +169,8 @@ function opslaanNieuwVerzoek() {
     const voor = document.getElementById('select-voor').value;
     const aantal = parseInt(document.getElementById('input-aantal').value, 10);
 
-    if (van === voor) return alert("Je kunt geen anytimers op jezelf verdienen!");
-    if (isNaN(aantal) || aantal <= 0) return alert("Vul een geldig aantal in.");
+    if (van === voor) return alert("Bij Davy Jones! Je kan toch geen schulden bij jezelf hebben?");
+    if (isNaN(aantal) || aantal <= 0) return alert("Krab, voer eens een fatsoenlijk aantal in!");
 
     const docId = `${van}_${voor}`;
     db.collection("anytimers").doc(docId).set({

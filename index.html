@@ -20,18 +20,25 @@
     <main>
         <!-- HET INLOGSCHERM -->
         <section id="view-login" class="view active">
+            <div class="theme-banner">
+                <img src="krabbias.png" alt="De Krabbia's" class="hero-img">
+            </div>
             <div class="login-box">
-                <h2>Welkom Huisgenoot</h2>
-                <p>Log in om verder te gaan</p>
+                <h2>Aan boord, Krabbia!</h2>
+                <p>Meld je aan bij de Krokante Krab</p>
                 <input type="email" id="login-email" placeholder="naam@krokantekrab.nl">
                 <input type="password" id="login-password" placeholder="Wachtwoord">
-                <button onclick="login()" class="actie-btn log-btn">Log In</button>
+                <button onclick="login()" class="actie-btn log-btn">Monsters aan monsteren ⚓</button>
                 <p id="login-error" class="error-msg"></p>
             </div>
         </section>
 
         <!-- HET HOMESCHERM -->
         <section id="view-home" class="view">
+            <div class="theme-banner">
+                <img src="krabbias.png" alt="De Krabbia's" class="hero-img">
+            </div>
+            
             <div class="menu-grid">
                 <button class="menu-btn" onclick="openScherm('anytimers')">
                     <span class="icon">⏱️</span> Anytimers
@@ -39,27 +46,27 @@
 
                 <button id="btn-weekend" class="menu-btn" onclick="openScherm('programma')">
                     <span class="icon">🏕️</span> Huisweekend
-                    <span id="weekend-status" class="status-badge">Checkt datum...</span>
+                    <span id="weekend-status" class="status-badge">Wachten...</span>
                 </button>
                 
                 <button class="menu-btn logout" onclick="uitloggen()">
-                    <span class="icon">🚪</span> Uitloggen
+                    <span class="icon">🚪</span> Van boord gaan
                 </button>
             </div>
         </section>
 
         <!-- HET PROGRAMMA SCHERM -->
         <section id="view-programma" class="view">
-            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug</button>
+            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug naar Kombuis</button>
             <div id="schema-container"></div>
         </section>
 
         <!-- HET ANYTIMER SCHERM -->
         <section id="view-anytimers" class="view">
-            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug</button>
+            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug naar Kombuis</button>
             
             <div class="actie-balk">
-                <button class="actie-btn" onclick="nieuwVerzoek()">+ Verdien Anytimers</button>
+                <button class="actie-btn" onclick="nieuwVerzoek()">+ Verdien Anytimers 🦀</button>
             </div>
 
             <div id="anytimer-container">
@@ -70,28 +77,27 @@
         <!-- ANYTIMER POP-UP (MODAL) -->
         <div id="anytimer-modal" class="modal">
             <div class="modal-content">
-                <h3>Verdien Anytimers</h3>
+                <h3>Verdien Anytimers 🍻</h3>
                 
-                <label>Van (Wie heeft ze verdiend?):</label>
+                <label>Gediend door (Wie heeft ze verdiend?):</label>
                 <select id="select-van"></select>
                 
-                <label>Voor (Op wie?):</label>
+                <label>In het krijt bij (Op wie?):</label>
                 <select id="select-voor"></select>
 
-                <label>Aantal:</label>
+                <label>Aantal glazen/stuks:</label>
                 <input type="number" id="input-aantal" value="1" min="1" max="100">
                 
                 <div class="modal-acties">
-                    <button onclick="sluitModal()" class="btn-sm btn-outline">Annuleer</button>
-                    <button onclick="opslaanNieuwVerzoek()" class="btn-sm btn-groen">Voeg Toe</button>
+                    <button onclick="sluitModal()" class="btn-sm btn-outline">Overboord goeien</button>
+                    <button onclick="opslaanNieuwVerzoek()" class="btn-sm btn-groen">In 't grootboek zetten 🦀</button>
                 </div>
             </div>
         </div>
     </main>
 
-    <!-- Firebase App (Core) -->
+    <!-- Firebase SDK's -->
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-app-compat.js"></script>
-    <!-- Firebase Auth & Firestore -->
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
     
