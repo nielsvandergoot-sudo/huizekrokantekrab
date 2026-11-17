@@ -4,39 +4,75 @@ let reqAnimFrame;
 let isPlaying = false;
 let score = 0;
 
-// Laad de getekende krab afbeelding
-const krabImg = new Image();
-krabImg.src = 'krabbias.png';
-
+// De krab is nu volledig in code getekend, dus geen rare afbeeldings-hitboxes meer!
 const krab = {
-    x: 50, y: 150, width: 34, height: 34,
-    gravity: 0.3, jump: 5.5, speed: 0,
+    x: 50, y: 150, width: 32, height: 22,
+    gravity: 0.35, jump: 5.8, speed: 0,
     draw: function() {
-        if (krabImg.complete) {
-            ctx.save();
-            // Verplaats het middelpunt naar de krab voor rotatie
-            ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
-            
-            // Roteer de krab: neus omhoog bij springen, omlaag bij vallen
-            let rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (this.speed * 0.1)));
-            ctx.rotate(rotation);
-            
-            // Teken het plaatje iets groter dan de daadwerkelijke hitbox (voelt beter)
-            ctx.drawImage(krabImg, -this.width/2 - 15, -this.height/2 - 15, this.width + 30, this.height + 30);
-            
-            ctx.restore();
-        } else {
-            // Nood-fallback
-            ctx.fillStyle = '#d94141';
-            ctx.fillRect(this.x, this.y, this.width, this.height);
-        }
+        ctx.save();
+        // Verplaats het middelpunt naar het hart van de hitbox voor de rotatie
+        ctx.translate(this.x + this.width / 2, this.y + this.height / 2);
+        
+        // Roteer de krab: neus omhoog bij springen, omlaag bij vallen
+        let rotation = Math.min(Math.PI / 4, Math.max(-Math.PI / 4, (this.speed * 0.1)));
+        ctx.rotate(rotation);
+        
+        // --- GETEKENDE KRABBIA (Vector) ---
+        // 1. Pootjes achter
+        ctx.strokeStyle = '#d94141';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.moveTo(-10, 5); ctx.lineTo(-15, 14); // Linksachter
+        ctx.moveTo(10, 5); ctx.lineTo(15, 14);   // Rechtsachter
+        ctx.stroke();
+
+        // 2. Lichaam (Ovaal)
+        ctx.fillStyle = '#d94141';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 16, 11, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // 3. Pootjes voor
+        ctx.beginPath();
+        ctx.moveTo(-5, 8); ctx.lineTo(-8, 16);
+        ctx.moveTo(5, 8); ctx.lineTo(8, 16);
+        ctx.stroke();
+
+        // 4. Scharen
+        ctx.beginPath();
+        ctx.arc(-12, -8, 6, 0, Math.PI * 2); // Linker schaar
+        ctx.arc(12, -8, 6, 0, Math.PI * 2);  // Rechter schaar
+        ctx.fill();
+        
+        // Gaten in de scharen (hapt hapje uit de cirkels)
+        ctx.fillStyle = '#f2ebd9'; // Achtergrondkleur
+        ctx.beginPath();
+        ctx.arc(-14, -10, 3, 0, Math.PI * 2);
+        ctx.arc(14, -10, 3, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 5. Zonnebril (Krabbia stijl)
+        ctx.fillStyle = '#1a2a3a';
+        ctx.beginPath();
+        ctx.arc(-6, -2, 5, 0, Math.PI, true); // Linker glas
+        ctx.arc(6, -2, 5, 0, Math.PI, true);  // Rechter glas
+        ctx.fill();
+        // Bril montuur (verbindingsstukje)
+        ctx.strokeStyle = '#1a2a3a';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(-11, -2);
+        ctx.lineTo(11, -2);
+        ctx.stroke();
+
+        ctx.restore();
     },
     update: function() {
         this.speed += this.gravity;
         this.y += this.speed;
         
-        // Bodem geraakt
-        if (this.y + this.height >= canvas.height - 30) { // -30 vanwege de zeebodem
+        // Bodem geraakt (rekening houdend met de zeebodem marge van 30px)
+        if (this.y + this.height >= canvas.height - 30) { 
             this.y = canvas.height - 30 - this.height;
             gameOver();
         }
@@ -53,9 +89,9 @@ const krab = {
 
 const pipes = {
     posities: [],
-    width: 55, // Iets bredere palen
-    gap: 140, // Iets groter gat zodat het eerlijk blijft
-    dx: 2.5,
+    width: 55, // Brede robuuste meerpalen
+    gap: 120,  // Ruime opening zodat het spel fair is
+    dx: 2.8,   // Iets meer snelheid
     draw: function() {
         for (let i = 0; i < this.posities.length; i++) {
             let p = this.posities[i];
@@ -64,7 +100,7 @@ const pipes = {
             
             // --- Houten meerpalen styling ---
             ctx.fillStyle = '#a67c52'; // Houtkleur
-            ctx.strokeStyle = '#1a2a3a'; // Donkere maritieme outline
+            ctx.strokeStyle = '#1a2a3a'; // Donkere outline
             ctx.lineWidth = 4;
 
             // Bovenste paal
@@ -76,7 +112,7 @@ const pipes = {
             ctx.strokeRect(p.x, bottomY, this.width, canvas.height - bottomY + 5);
 
             // Touwtjes detail
-            ctx.fillStyle = '#f4edd2'; // Zand/Touw kleur
+            ctx.fillStyle = '#e5d7ba';
             ctx.fillRect(p.x, topY - 15, this.width, 6);
             ctx.fillRect(p.x, topY - 25, this.width, 6);
             ctx.fillRect(p.x, bottomY + 10, this.width, 6);
@@ -84,8 +120,7 @@ const pipes = {
         }
     },
     update: function() {
-        // Voeg elke 90 frames een nieuwe paal toe
-        if (frames % 90 === 0) {
+        if (frames % 80 === 0) {
             this.posities.push({
                 x: canvas.width,
                 y: Math.random() * (canvas.height - this.gap - 80) + 30
@@ -96,7 +131,6 @@ const pipes = {
             let p = this.posities[i];
             p.x -= this.dx;
 
-            // Paal is voorbij de krab (score +1)
             if (p.x + this.width <= 0) {
                 this.posities.shift();
                 score++;
@@ -104,9 +138,9 @@ const pipes = {
                 continue;
             }
 
-            // Hitbox (botsing detectie) - met een kleine 'forgiveness' marge van 5px
-            if (krab.x + krab.width - 5 > p.x && krab.x + 5 < p.x + this.width) {
-                if (krab.y + 5 < p.y || krab.y + krab.height - 5 > p.y + this.gap) {
+            // Strakke Hitbox-detectie (AABB collision) zonder vage marges
+            if (krab.x + krab.width > p.x && krab.x < p.x + this.width) {
+                if (krab.y < p.y || krab.y + krab.height > p.y + this.gap) {
                     gameOver();
                 }
             }
@@ -117,18 +151,16 @@ const pipes = {
     }
 };
 
-// Bewegende zand-bodem
 const zeebodem = {
     x: 0,
     draw: function() {
-        ctx.fillStyle = '#e5d7ba'; // Iets donkerder zand
+        ctx.fillStyle = '#e5d7ba'; 
         ctx.beginPath();
-        // Teken golvend zand onderaan het scherm
         for(let i = -20; i < canvas.width + 40; i += 30) {
             ctx.arc(i + this.x, canvas.height - 5, 20, 0, Math.PI, true);
         }
         ctx.fill();
-        this.x = (this.x - 1) % 30; // Parallax scroll effect
+        this.x = (this.x - 1.5) % 30; // parallax scroll
     }
 };
 
@@ -136,19 +168,17 @@ function drawScore() {
     ctx.fillStyle = '#ffffff';
     ctx.strokeStyle = '#1a2a3a';
     ctx.lineWidth = 5;
-    ctx.font = '900 40px -apple-system, sans-serif';
+    ctx.font = '900 45px -apple-system, sans-serif';
+    ctx.textAlign = 'center';
     
-    // Teken in het midden bovenaan
-    ctx.strokeText(score, canvas.width / 2 - 12, 50); // Outline
-    ctx.fillText(score, canvas.width / 2 - 12, 50);   // Binnenkant
+    ctx.strokeText(score, canvas.width / 2, 60); 
+    ctx.fillText(score, canvas.width / 2, 60);
 }
 
 function draw() {
-    // 1. Achtergrondkleur (exact hetzelfde als je krabbias plaatje)
-    ctx.fillStyle = '#f2ebd9'; 
+    ctx.fillStyle = '#f2ebd9'; // Warme zand/zee achtergrond
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-    // 2. Teken de rest
     pipes.draw();
     zeebodem.draw();
     krab.draw();
@@ -172,7 +202,6 @@ function initGame() {
     canvas = document.getElementById('game-canvas');
     ctx = canvas.getContext('2d');
     
-    // Tap / Klik besturing
     canvas.addEventListener('mousedown', () => { if (isPlaying) krab.flap(); });
     canvas.addEventListener('touchstart', (e) => { e.preventDefault(); if (isPlaying) krab.flap(); }, {passive: false});
     window.addEventListener('keydown', (e) => { if (e.code === 'Space' && isPlaying) krab.flap(); });
