@@ -117,16 +117,29 @@ function renderAnytimers() {
         let actieKnoppen = '';
         let tekst = '';
 
+        // Check de rollen
+        const isEigenaar = (at.van === currentUser);
+
         if (at.inzet_actief) {
-            tekst = `<div class="inzet-waarschuwing">🚨 ADRENALINE! ${at.van} zet er een in op ${at.voor}!</div>`;
-            actieKnoppen = `
-                <button onclick="resolveInzet('${at.id}', true)" class="btn-sm btn-groen">Getrokken! (Adt 'm) 🍺</button>
-                <button onclick="resolveInzet('${at.id}', false)" class="btn-sm btn-rood">Weigering (+1 extra) ❌</button>
-                <button onclick="cancelInzet('${at.id}')" class="btn-sm btn-outline">Laat maar</button>
-            `;
+            if (isEigenaar) {
+                tekst = `<div class="inzet-waarschuwing">🚨 ADRENALINE! Jij zet er een in op ${at.voor}!</div>`;
+                actieKnoppen = `
+                    <button onclick="resolveInzet('${at.id}', true)" class="btn-sm btn-groen">Getrokken! (Adt 'm) 🍺</button>
+                    <button onclick="resolveInzet('${at.id}', false)" class="btn-sm btn-rood">Weigering (+1 extra) ❌</button>
+                    <button onclick="cancelInzet('${at.id}')" class="btn-sm btn-outline">Laat maar</button>
+                `;
+            } else {
+                tekst = `<div class="inzet-waarschuwing">🚨 ADRENALINE! ${at.van} zet er een in op JOU!</div>`;
+                actieKnoppen = `<span style="color: #d94141; font-weight: bold; font-size: 14px;">Trekken krab! Wacht tot ${at.van} hem afvinkt... 🍻</span>`;
+            }
         } else {
-            tekst = `<strong>${at.van}</strong> heeft <strong>${at.aantal}</strong> openstaan bij <strong>${at.voor}</strong>`;
-            actieKnoppen = `<button onclick="startInzet('${at.id}')" class="btn-sm btn-rood">Zet er een in! ⏱️</button>`;
+            if (isEigenaar) {
+                tekst = `<strong>Jij</strong> hebt <strong>${at.aantal}</strong> openstaan bij <strong>${at.voor}</strong>`;
+                actieKnoppen = `<button onclick="startInzet('${at.id}')" class="btn-sm btn-rood">Zet er een in! ⏱️</button>`;
+            } else {
+                tekst = `<strong>${at.van}</strong> heeft <strong>${at.aantal}</strong> openstaan bij <strong>JOU</strong>`;
+                actieKnoppen = `<span style="color: #5c4e3c; font-size: 0.85em; font-style: italic;">Je bent overgeleverd aan de genade van ${at.van}.</span>`;
+            }
         }
 
         card.innerHTML = `<div class="at-info">${tekst}</div><div class="at-acties">${actieKnoppen}</div>`;
