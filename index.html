@@ -20,9 +20,7 @@
     <main>
         <!-- HET INLOGSCHERM -->
         <section id="view-login" class="view active">
-            <div class="theme-banner">
-                <img src="krabbias.png" alt="De Krabbia's" class="hero-img">
-            </div>
+            <div class="theme-banner"><img src="krabbias.png" alt="De Krabbia's" class="hero-img"></div>
             <div class="login-box">
                 <h2>Aan boord, Krabbia!</h2>
                 <p>Meld je aan bij de Krokante Krab</p>
@@ -35,23 +33,54 @@
 
         <!-- HET HOMESCHERM -->
         <section id="view-home" class="view">
-            <div class="theme-banner">
-                <img src="krabbias.png" alt="De Krabbia's" class="hero-img">
-            </div>
-            
+            <div class="theme-banner"><img src="krabbias.png" alt="De Krabbia's" class="hero-img"></div>
             <div class="menu-grid">
+                <button class="menu-btn" onclick="openScherm('speelhal')">
+                    <span class="icon">🕹️</span> Gimma spelen
+                </button>
                 <button class="menu-btn" onclick="openScherm('anytimers')">
                     <span class="icon">⏱️</span> Anytimers
                 </button>
-
                 <button id="btn-weekend" class="menu-btn" onclick="openScherm('programma')">
-                    <span class="icon">🏕️</span> Huisthuisweekend
+                    <span class="icon">🏕️</span> Huisweekend
                     <span id="weekend-status" class="status-badge">Wachten...</span>
                 </button>
-                
                 <button class="menu-btn logout" onclick="uitloggen()">
                     <span class="icon">🚪</span> Wakka zetten
                 </button>
+            </div>
+        </section>
+
+        <!-- HET SPEELHAL SCHERM -->
+        <section id="view-speelhal" class="view">
+            <button class="terug-btn" onclick="openScherm('home')">⬅ Terug naar osso</button>
+            
+            <div class="actie-balk" style="text-align: center; margin-bottom: 25px;">
+                <button class="actie-btn log-btn" style="padding: 20px; font-size: 20px;" onclick="openScherm('game')">Start Flappy Krab 🦀</button>
+            </div>
+
+            <div class="card">
+                <h3 style="color: #d94141; margin-bottom: 15px; text-transform: uppercase;">🏆 All-Time Scorebord</h3>
+                <div id="leaderboard-container">
+                    <!-- Gevuld door JS -->
+                </div>
+            </div>
+        </section>
+
+        <!-- HET GAME SCHERM -->
+        <section id="view-game" class="view">
+            <button class="terug-btn" onclick="stopGame(); openScherm('speelhal')">⬅ Stop & Terug</button>
+            
+            <div id="game-container">
+                <!-- Het Canvas -->
+                <canvas id="game-canvas" width="320" height="480"></canvas>
+                
+                <!-- Game Over Overlay -->
+                <div id="game-over-scherm" style="display: none;">
+                    <h2 style="color: #d94141; margin-bottom: 10px;">Game Over!</h2>
+                    <p style="margin-bottom: 20px; font-weight: bold; font-size: 18px;">Score: <span id="eind-score">0</span></p>
+                    <button class="btn-sm btn-groen" style="width: 100%; padding: 15px; font-size: 18px;" onclick="startGame()">Opnieuw Spelen 🔄</button>
+                </div>
             </div>
         </section>
 
@@ -64,30 +93,22 @@
         <!-- HET ANYTIMER SCHERM -->
         <section id="view-anytimers" class="view">
             <button class="terug-btn" onclick="openScherm('home')">⬅ Terug naar osso</button>
-            
             <div class="actie-balk">
                 <button class="actie-btn" onclick="nieuwVerzoek()">+ Verdien Anytimers 🦀</button>
             </div>
-
-            <div id="anytimer-container">
-                <!-- Wordt gevuld door JavaScript -->
-            </div>
+            <div id="anytimer-container"></div>
         </section>
 
-        <!-- ANYTIMER POP-UP (MODAL) -->
+        <!-- ANYTIMER POP-UP -->
         <div id="anytimer-modal" class="modal">
             <div class="modal-content">
                 <h3>Verdien Anytimers 🍻</h3>
-                
                 <label>Verdiend door (Wie heeft ze verdiend?):</label>
                 <select id="select-van"></select>
-                
                 <label>Op wie?:</label>
                 <select id="select-voor"></select>
-
                 <label>Aantal:</label>
                 <input type="number" id="input-aantal" value="1" min="1" max="100">
-                
                 <div class="modal-acties">
                     <button onclick="sluitModal()" class="btn-sm btn-outline">Annuleren</button>
                     <button onclick="opslaanNieuwVerzoek()" class="btn-sm btn-groen">Bevestigen 🦀</button>
@@ -101,6 +122,8 @@
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.6.0/firebase-firestore-compat.js"></script>
     
+    <!-- Eigen Scripts (Zorg dat game.js ERVOOR of ERNA staat) -->
+    <script src="game.js"></script>
     <script src="app.js"></script>
 </body>
 </html>

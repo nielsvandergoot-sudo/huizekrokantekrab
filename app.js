@@ -3,6 +3,7 @@ const huisgenoten = ['Niels', 'Fay', 'Aimee', 'Minou', 'Aniek', 'Suus', 'Jesper'
 
 let currentUser = null;
 let anytimers = [];
+let flappyScores = [];
 
 // --- FIREBASE CONFIGURATIE ---
 const firebaseConfig = {
@@ -63,6 +64,14 @@ function openScherm(schermNaam) {
         titel.textContent = 'Anytimers';
         renderAnytimers();
     }
+    else if (schermNaam === 'speelhal') {
+        titel.textContent = 'De Speelhal 🕹️';
+        renderLeaderboard();
+    }
+    else if (schermNaam === 'game') {
+        titel.textContent = 'Flappy Krab';
+        startGame(); // Start de game loop in game.js
+    }
 }
 
 // --- HUISWEEKEND TIJDSLOT ---
@@ -86,8 +95,9 @@ function updateWeekendKnop() {
     }
 }
 
-// --- ANYTIMER LEDGER LOGICA ---
+// --- DATABASE LISTENERS ---
 function startDatabaseListener() {
+    // 1. Anytimers
     db.collection("anytimers").onSnapshot((snapshot) => {
         anytimers = [];
         snapshot.forEach((doc) => anytimers.push({ id: doc.id, ...doc.data() }));
@@ -95,12 +105,56 @@ function startDatabaseListener() {
             renderAnytimers();
         }
     });
+
+    // 2. Scorebord (Nieuw)
+    db.collection("flappy_scores").orderBy("score", "desc").onSnapshot((snapshot) => {
+        flappyScores = [];
+        snapshot.forEach((doc) => flappyScores.push({ id: doc.id, ...doc.data() }));
+        if (document.getElementById('view-speelhal').classList.contains('active')) {
+            renderLeaderboard();
+        }
+    });
 }
 
+// --- SCOREBORD LOGICA ---
+function renderLeaderboard() {
+    const container = document.getElementById('leaderboard-container');
+    container.innerHTML = '';
+
+    if (flappyScores.length === 0) {
+        container.innerHTML = '<p style="color:#5c4e3c; font-style:italic;">Nog niemand heeft gespeeld. Pak die eerste plek!</p>';
+        return;
+    }
+
+    let html = '<ol class="score-lijst">';
+    flappyScores.forEach((s, index) => {
+        let medal = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '🦀';
+        html += `<li><span class="score-naam">${s.naam}</span> <span class="score-punten">${s.score} pt ${medal}</span></li>`;
+    });
+    html += '</ol>';
+    container.innerHTML = html;
+}
+
+function slaScoreOp(nieuweScore) {
+    if (nieuweScore <= 0) return;
+    
+    const docRef = db.collection("flappy_scores").doc(currentUser);
+    docRef.get().then((doc) => {
+        // Alleen opslaan als we de oude highscore hebben verbroken
+        if (!doc.exists || doc.data().score < nieuweScore) {
+            docRef.set({
+                naam: currentUser,
+                score: nieuweScore,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp()
+            });
+        }
+    });
+}
+
+// --- ANYTIMER LEDGER LOGICA (Zelfde als voorheen) ---
 function renderAnytimers() {
     const container = document.getElementById('anytimer-container');
     container.innerHTML = '';
-
     const mijnAnytimers = anytimers.filter(at => at.van === currentUser || at.voor === currentUser);
 
     if (mijnAnytimers.length === 0) {
@@ -110,24 +164,18 @@ function renderAnytimers() {
 
     mijnAnytimers.forEach(at => {
         if ((at.aantal || 0) <= 0 && !at.inzet_actief) return;
-
         const card = document.createElement('div');
         card.className = `at-card ${at.inzet_actief ? 'inzet' : 'normaal'}`;
-        
         let actieKnoppen = '';
         let tekst = '';
-
-        // Check de rollen
         const isEigenaar = (at.van === currentUser);
 
         if (at.inzet_actief) {
             if (isEigenaar) {
                 tekst = `<div class="inzet-waarschuwing">🚨 ADRENALINE! Jij zet er een in op ${at.voor}!</div>`;
-                actieKnoppen = `
-                    <button onclick="resolveInzet('${at.id}', true)" class="btn-sm btn-groen">Getrokken! (Adt 'm) 🍺</button>
-                    <button onclick="resolveInzet('${at.id}', false)" class="btn-sm btn-rood">Weigering (+1 extra) ❌</button>
-                    <button onclick="cancelInzet('${at.id}')" class="btn-sm btn-outline">Laat maar</button>
-                `;
+                actieKnoppen = `<button onclick="resolveInzet('${at.id}', true)" class="btn-sm btn-groen">Getrokken! (Adt 'm) 🍺</button>
+                                <button onclick="resolveInzet('${at.id}', false)" class="btn-sm btn-rood">Weigering (+1 extra) ❌</button>
+                                <button onclick="cancelInzet('${at.id}')" class="btn-sm btn-outline">Laat maar</button>`;
             } else {
                 tekst = `<div class="inzet-waarschuwing">🚨 ADRENALINE! ${at.van} zet er een in op JOU!</div>`;
                 actieKnoppen = `<span style="color: #d94141; font-weight: bold; font-size: 14px;">Trekken krab! Wacht tot ${at.van} hem afvinkt... 🍻</span>`;
@@ -141,12 +189,10 @@ function renderAnytimers() {
                 actieKnoppen = `<span style="color: #5c4e3c; font-size: 0.85em; font-style: italic;">Je bent overgeleverd aan de genade van ${at.van}.</span>`;
             }
         }
-
         card.innerHTML = `<div class="at-info">${tekst}</div><div class="at-acties">${actieKnoppen}</div>`;
         container.appendChild(card);
     });
 }
-
 function startInzet(id) { db.collection("anytimers").doc(id).update({ inzet_actief: true }); }
 function cancelInzet(id) { db.collection("anytimers").doc(id).update({ inzet_actief: false }); }
 function resolveInzet(id, getrokken) {
@@ -155,36 +201,26 @@ function resolveInzet(id, getrokken) {
         inzet_actief: false
     });
 }
-
-// --- MODAL LOGICA ---
 function nieuwVerzoek() {
     const selectVan = document.getElementById('select-van');
     const selectVoor = document.getElementById('select-voor');
-    
     selectVan.innerHTML = '';
     selectVoor.innerHTML = '';
     document.getElementById('input-aantal').value = 1;
-    
     huisgenoten.forEach(naam => {
         selectVan.innerHTML += `<option value="${naam}">${naam}</option>`;
         selectVoor.innerHTML += `<option value="${naam}">${naam}</option>`;
     });
-
     selectVan.value = currentUser;
-
     document.getElementById('anytimer-modal').classList.add('actief');
 }
-
 function sluitModal() { document.getElementById('anytimer-modal').classList.remove('actief'); }
-
 function opslaanNieuwVerzoek() {
     const van = document.getElementById('select-van').value;
     const voor = document.getElementById('select-voor').value;
     const aantal = parseInt(document.getElementById('input-aantal').value, 10);
-
     if (van === voor) return alert("Waarom de fuck zou je jezelf een anytimer geven?");
     if (isNaN(aantal) || aantal <= 0) return alert("Krab, voer eens een fatsoenlijk aantal in!");
-
     const docId = `${van}_${voor}`;
     db.collection("anytimers").doc(docId).set({
         van: van,
@@ -193,30 +229,25 @@ function opslaanNieuwVerzoek() {
         inzet_actief: false
     }, { merge: true }).then(() => sluitModal());
 }
-
-// --- INITIALISATIE ---
 document.addEventListener('DOMContentLoaded', () => {
     updateWeekendKnop();
-    
     const container = document.getElementById('schema-container');
     if(container) {
-        fetch('schema.json')
-            .then(response => response.json())
-            .then(data => {
-                let huidigeDag = '';
-                data.forEach(item => {
-                    if (item.dag !== huidigeDag) {
-                        const dagKop = document.createElement('h2');
-                        dagKop.className = 'dag-header';
-                        dagKop.textContent = item.dag;
-                        container.appendChild(dagKop);
-                        huidigeDag = item.dag;
-                    }
-                    const card = document.createElement('div');
-                    card.className = 'card';
-                    card.innerHTML = `<div class="card-top"><span class="activiteit">${item.activiteit}</span><span class="tijd">${item.tijd}</span></div><div class="details">${item.details}</div>`;
-                    container.appendChild(card);
-                });
-            }).catch(e => console.log('Fout bij schema laden:', e));
+        fetch('schema.json').then(r => r.json()).then(data => {
+            let huidigeDag = '';
+            data.forEach(item => {
+                if (item.dag !== huidigeDag) {
+                    const dagKop = document.createElement('h2');
+                    dagKop.className = 'dag-header';
+                    dagKop.textContent = item.dag;
+                    container.appendChild(dagKop);
+                    huidigeDag = item.dag;
+                }
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `<div class="card-top"><span class="activiteit">${item.activiteit}</span><span class="tijd">${item.tijd}</span></div><div class="details">${item.details}</div>`;
+                container.appendChild(card);
+            });
+        }).catch(e => console.log('Fout bij schema laden:', e));
     }
 });
